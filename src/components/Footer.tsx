@@ -114,10 +114,13 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
               © 2025 Digital IMALAG. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors duration-200">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors duration-200">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors duration-200">Sitemap</a>
-            </div>
+
+  <button onClick={() => setCurrentPage("privacy")}>Privacy Policy</button>
+<button onClick={() => setCurrentPage("terms")}>Terms of Service</button>
+<button onClick={() => setCurrentPage("sitemap")}>Sitemap</button>
+
+</div>
+
           </div>
         </div>
       </div>

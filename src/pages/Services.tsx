@@ -17,11 +17,15 @@ import {
   ArrowRight
 } from 'lucide-react';
 
+
 interface ServicesProps {
   defaultCategory?: string;
+  setCurrentPage?: (page: string) => void;   // ← ADD THIS
 }
 
-const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
+
+const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCurrentPage }) => {
+
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState('');
@@ -52,7 +56,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
       title: 'Business Websites',
       description:
         'Custom-designed responsive websites that represent your brand, attract visitors, and convert leads into customers.',
-          color: '#eb904b',
+          color: '#0ba5b0ff',
         features: [
         'Corporate & Portfolio Sites',
         'Mobile-First Responsive Design',
@@ -65,7 +69,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
       title: 'E-Commerce Websites',
       description:
         'Complete online store solutions that help you sell products and manage orders with ease.',
-        color: '#813085',
+        color: '#0ba5b0ff',
       features: [
         'Product Catalog & Cart System',
         'Payment Gateway Integration',
@@ -78,7 +82,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
       title: 'Portfolio & Creative Websites',
       description:
         'Stylish and engaging portfolio sites for artists, designers, and creators to showcase their best work.',
-        color: '#2820ffff',
+        color: '#0ba5b0ff',
       features: [
         'Dynamic Gallery Layouts',
         'Media-Ready Design',
@@ -91,7 +95,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
       title: 'Landing Pages & One-Page Sites',
       description:
         'High-converting landing pages designed for marketing campaigns and product promotions.',
-        color: '#a70e0eff',
+        color: '#0ba5b0ff',
       features: [
         'Conversion-Focused Layouts',
         'Call-to-Action Optimization',
@@ -104,7 +108,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
       title: 'Website Maintenance & Support',
       description:
         'Keep your site running smoothly with ongoing updates, backups, and performance optimization.',
-        color: '#02a3b5ff',
+        color: '#0ba5b0ff',
       features: [
         'Regular Content Updates',
         'Security Monitoring',
@@ -275,7 +279,8 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
     </div>
  {/*Showcase Section */}
 {selectedCategory === 'website' && (
-  <div className="mb-20 text-center">
+  <div id="portfolioSection" className="mb-20 text-center">
+
     <h2 className="text-3xl font-bold text-black mb-8">Our Recent Website Projects</h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
   {websiteProjects.map((project, i) => (
@@ -309,8 +314,8 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
 {selectedCategory === 'google' && (
   <div className="mb-20 text-center">
     <h2 className="text-3xl font-bold mb-8">Google Virtual Tour Examples</h2>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      {['/images/vt1.jpg', '/images/vt2.jpg', '/images/vt3.jpg'].map((img, i) => (
+     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      {['/images/vt1.png', '/images/vt2.png', '/images/vt5.png', '/images/vt4.png', '/images/vt3.png'].map((img, i) => (
         <img
           key={i}
           src={img}
@@ -329,7 +334,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
 )}
 {selectedCategory === 'digital' && (
   <div className="mb-20 text-center">
-    <h2 className="text-3xl font-bold mb-8">Our YouTube & Social Media Work</h2>
+    {/* <h2 className="text-3xl font-bold mb-8">Our YouTube & Social Media Work</h2>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
       {['/images/yt1.jpg', '/images/yt2.jpg', '/images/yt3.jpg', '/images/yt4.jpg'].map((img, i) => (
         <img
@@ -339,7 +344,8 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
           className="rounded-xl shadow-md hover:scale-105 transition-all duration-300"
         />
       ))}
-    </div>
+    </div> */}
+
     {/*<iframe
       className="w-full max-w-4xl mx-auto h-96 rounded-xl shadow-lg"
       src="https://www.youtube.com/embed/9bZkp7q19f0"
@@ -372,7 +378,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
     <div
       key={index}
       className="service-item relative"
-      style={{ "--color": service.color ?? "#ef8a3cff" } as React.CSSProperties}
+      style={{ "--color": service.color ?? "#0ba5b0ff" } as React.CSSProperties}
     >
       <div className="service-layer">
 
@@ -380,14 +386,14 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
         <div className="flex items-center mb-6">
           <div
             className="w-14 h-14 rounded-xl flex items-center justify-center mr-4 text-white"
-            style={{ backgroundColor: service.color ?? "#eb904b" }}
+            style={{ backgroundColor: service.color ?? "#684022ff" }}
           >
             <IconComponent className="w-7 h-7" />
           </div>
 
           <h3
             className="text-xl font-bold"
-            style={{ color: service.color ?? "#eb904b" }}
+            style={{ color: service.color ?? "#633d1fff" }}
           >
             {service.title}
           </h3>
@@ -404,7 +410,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
             <div key={featureIndex} className="flex items-center space-x-3">
               <div
                 className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: service.color ?? "#eb904b" }}
+                style={{ backgroundColor: service.color ?? "#684022ff" }}
               ></div>
               <span className="text-gray-800">{feature}</span>
             </div>
@@ -448,13 +454,28 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website' }) => {
             Don't see exactly what you're looking for? We create custom solutions tailored to your specific business requirements.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl">
-              Discuss Your Needs
-            </button>
-            <button className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl">
-              View Portfolio
-            </button>
-          </div>
+
+  {/* 👉 Redirect to Contact Page */}
+  <button
+    onClick={() => setCurrentPage && setCurrentPage('contact')}
+    className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
+  >
+    Discuss Your Needs
+  </button>
+
+  {/* 👉 Scroll to Website Projects Section */}
+  <button
+    onClick={() => {
+      const section = document.getElementById("portfolioSection");
+      if (section) section.scrollIntoView({ behavior: "smooth" });
+    }}
+    className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
+  >
+    View Portfolio
+  </button>
+
+</div>
+
         </div>
       </div>
     </div>

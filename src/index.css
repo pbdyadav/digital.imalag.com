@@ -105,3 +105,22 @@ body {
 .service-title {
   color: #fff;
 }
+/* Smooth fade + slide animation */
+@keyframes mapFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    box-shadow: none;
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.map-animated {
+  animation: mapFadeUp 0.9s ease-out forwards;
+}

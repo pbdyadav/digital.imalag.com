@@ -102,17 +102,27 @@ const Contact: React.FC = () => {
                 })}
               </div>
 
-              {/* Map Placeholder */}
-              <div className="mt-8">
-                <h3 className="font-semibold text-gray-900 mb-4">Our Location</h3>
-                <div className="bg-gray-200 h-48 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500">Interactive Map</p>
-                    <p className="text-sm text-gray-400">Indore, Madhya Pradesh, India</p>
-                  </div>
-                </div>
-              </div>
+              {/* Google Map */}
+{/* Google Map (Animated) */}
+<div className="mt-8">
+  <h3 className="font-semibold text-gray-900 mb-4">Our Location</h3>
+
+  <div className="rounded-xl overflow-hidden shadow-xl map-animated">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3680.039714491385!2d75.88530759999999!3d22.7267652!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3962fdc9dabb5b97%3A0x28f3e3eee1722694!2sDigital%20IMALAG!5e0!3m2!1sen!2sin!4v1763571849424!5m2!1sen!2sin"
+      width="100%"
+      height="250"
+      style={{ border: 0 }}
+      allowFullScreen
+      loading="lazy"
+      referrerPolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+
+  <p className="text-gray-600 text-sm mt-2">
+    Indore, Madhya Pradesh, India
+  </p>
+</div>
             </div>
           </div>
 
