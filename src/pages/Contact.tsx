@@ -83,7 +83,7 @@ const Contact: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Contact Information
               </h2>
-              
+
               <div className="space-y-6">
                 {contactInfo.map((info, index) => {
                   const IconComponent = info.icon;
@@ -103,36 +103,36 @@ const Contact: React.FC = () => {
               </div>
 
               {/* Google Map */}
-{/* Google Map (Animated) */}
-<div className="mt-8">
-  <h3 className="font-semibold text-gray-900 mb-4">Our Location</h3>
+              {/* Google Map (Animated) */}
+              <div className="mt-8">
+                <h3 className="font-semibold text-gray-900 mb-4">Our Location</h3>
 
-  <div className="rounded-xl overflow-hidden shadow-xl map-animated">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3680.039714491385!2d75.88530759999999!3d22.7267652!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3962fdc9dabb5b97%3A0x28f3e3eee1722694!2sDigital%20IMALAG!5e0!3m2!1sen!2sin!4v1763571849424!5m2!1sen!2sin"
-      width="100%"
-      height="250"
-      style={{ border: 0 }}
-      allowFullScreen
-      loading="lazy"
-      referrerPolicy="no-referrer-when-downgrade"
-    ></iframe>
-  </div>
+                <div className="rounded-xl overflow-hidden shadow-xl map-animated">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3680.039714491385!2d75.88530759999999!3d22.7267652!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3962fdc9dabb5b97%3A0x28f3e3eee1722694!2sDigital%20IMALAG!5e0!3m2!1sen!2sin!4v1763571849424!5m2!1sen!2sin"
+                    width="100%"
+                    height="250"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
 
-  <p className="text-gray-600 text-sm mt-2">
-    Indore, Madhya Pradesh, India
-  </p>
-</div>
+                <p className="text-gray-600 text-sm mt-2">
+                  Indore, Madhya Pradesh, India
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="liquid-glass p-10 flex flex-col items-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center tracking-wide">
                 Send Us a Message
               </h2>
-              
+
               {isSubmitted ? (
                 <div className="text-center py-12">
                   <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
@@ -140,7 +140,7 @@ const Contact: React.FC = () => {
                   <p className="text-gray-600 mb-6">
                     Your message has been sent successfully. We'll get back to you within 2 hours.
                   </p>
-                  <button 
+                  <button
                     onClick={() => setIsSubmitted(false)}
                     className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
                   >
@@ -165,7 +165,7 @@ const Contact: React.FC = () => {
                         placeholder="Enter your full name"
                       />
                     </div>
-                    
+
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                         Email Address *
@@ -199,7 +199,7 @@ const Contact: React.FC = () => {
                         placeholder="+91 98765 43210"
                       />
                     </div>
-                    
+
                     <div>
                       <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-2">
                         Service Interest
@@ -258,9 +258,15 @@ const Contact: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">WhatsApp Chat</h3>
             <p className="text-gray-600 mb-4">Get instant support via WhatsApp</p>
-            <button className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200">
+            {/* WhatsApp */}
+            <a
+              href="https://wa.me/919893567595"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200"
+            >
               Chat Now
-            </button>
+            </a>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
@@ -269,9 +275,13 @@ const Contact: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Schedule a Call</h3>
             <p className="text-gray-600 mb-4">Book a consultation call with our experts</p>
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
+            {/* Call */}
+            <a
+              href="tel:+919893567595"
+              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+            >
               Book Call
-            </button>
+            </a>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
@@ -280,9 +290,13 @@ const Contact: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Support</h3>
             <p className="text-gray-600 mb-4">Send us an email for detailed inquiries</p>
-            <button className="bg-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200">
+            {/* Email */}
+            <a
+              href="mailto:praveenyadav4u@gmail.com?subject=Service%20Inquiry"
+              className="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200"
+            >
               Send Email
-            </button>
+            </a>
           </div>
         </div>
       </div>

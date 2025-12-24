@@ -92,7 +92,7 @@ const About: React.FC = () => {
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 bg-white rounded-xl p-6 shadow-xl">
-                <div className="text-3xl font-bold text-blue-600">5+</div>
+                <div className="text-3xl font-bold text-blue-600">25+</div>
                 <div className="text-sm text-gray-600">Years of Excellence</div>
               </div>
             </div>
@@ -182,9 +182,9 @@ const About: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div>
-              <div className="text-4xl font-bold text-blue-200 mb-2">24/7</div>
+              <div className="text-4xl font-bold text-blue-200 mb-2">11:00am - 7:00pm</div>
               <div className="font-semibold mb-2">Support Available</div>
-              <div className="text-blue-100 text-sm">Round-the-clock technical assistance</div>
+              <div className="text-blue-100 text-sm">{/*Round-the-clock technical assistance*/}</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-blue-200 mb-2">100%</div>

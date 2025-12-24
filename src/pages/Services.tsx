@@ -315,7 +315,7 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
   <div className="mb-20 text-center">
     <h2 className="text-3xl font-bold mb-8">Google Virtual Tour Examples</h2>
      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      {['/images/vt1.png', '/images/vt2.png', '/images/vt5.png', '/images/vt4.png', '/images/vt3.png'].map((img, i) => (
+      {['/images/vt1.png', '/images/vt5.mp4', '/images/vt2.png', '/images/vt4.png', '/images/vt3.png'].map((img, i) => (
         <img
           key={i}
           src={img}
