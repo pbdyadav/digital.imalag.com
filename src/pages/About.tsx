@@ -61,8 +61,18 @@ const About: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-black mb-6">
             About Digital IMALAG
           </h1>
-          <p className="text-xl text-black max-w-3xl mx-auto leading-relaxed">
-            Part of the trusted IMALAG brand, we are your dedicated partner for comprehensive digital transformation and IT solutions across India and beyond.
+          <p className="text-lg md:text-xl text-black leading-loose w-full text-justify">
+            Part of the trusted <strong>IMALAG</strong> brand, <strong>Digital IMALAG</strong> is your reliable partner for comprehensive digital transformation and IT solutions across India and beyond.
+            <br /><br />
+            We specialize in building modern websites, providing IT infrastructure support, and delivering smart digital solutions tailored to your business needs.
+            <br /><br />
+            Our approach is focused on understanding your <strong>goals, challenges, and vision</strong> before crafting the right strategy.
+            <br /><br />
+            With a strong commitment to quality, innovation, and transparency, we help businesses establish a powerful digital presence.
+            <br /><br />
+            From startups to established enterprises, we work closely with our clients to deliver scalable and future-ready solutions.
+            <br /><br />
+            At <strong>Digital IMALAG</strong>, your growth, reliability, and long-term success are always our top priority.
           </p>
         </div>
 
@@ -85,9 +95,9 @@ const About: React.FC = () => {
             </div>
             <div className="relative">
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 shadow-xl">
-                <img 
-                  src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg" 
-                  alt="Team working on digital solutions" 
+                <img
+                  src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg"
+                  alt="Team working on digital solutions"
                   className="w-full h-80 object-cover rounded-lg shadow-lg"
                 />
               </div>
@@ -123,11 +133,17 @@ const About: React.FC = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
               Our Values
             </h2>
-            <p className="text-xl text-black max-w-2xl mx-auto">
+            
+              <p className="text-xl md:text-xl text-black leading-relaxed w-full">
               These core principles guide every decision we make and every solution we deliver.
+              They define how we work, how we collaborate with our clients, and how we measure success.
+              We believe in building trust through transparency, consistency, and honest communication.
+              Quality, innovation, and reliability remain at the heart of everything we create.
+              Our values push us to deliver solutions that are not only effective today but sustainable for the future.
+              At Digital IMALAG, values are not just words — they are commitments we stand by.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => {
               const IconComponent = value.icon;
@@ -154,13 +170,13 @@ const About: React.FC = () => {
               Experienced professionals dedicated to delivering exceptional results for your business.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {team.map((member, index) => (
               <div key={index} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
                 <div className="aspect-w-4 aspect-h-3">
-                  <img 
-                    src={member.image} 
+                  <img
+                    src={member.image}
                     alt={member.name}
                     className="w-full h-64 object-cover"
                   />

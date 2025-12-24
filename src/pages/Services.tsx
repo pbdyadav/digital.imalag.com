@@ -38,86 +38,86 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
     { img: "/images/w6.png", link: "https://inventory.imalag.com/" },
     { img: "/images/w2.png", link: "https://www.reikiwellness.in/" },
     { img: "/images/w5.png", link: "https://multitools.imalag.com/" },
-    
-    
+
+
   ];
 
   const serviceCategories = {
     website: {
-  title: 'Website Development',
-  
-  description:
-    'Professional website design and development services to build your digital identity and grow your business online.',
-  icon: Globe, // You can use a better icon if available, like Code or Monitor
-  
-  services: [
-    {
-      icon: Globe,
-      title: 'Business Websites',
+      title: 'Website Development',
+
       description:
-        'Custom-designed responsive websites that represent your brand, attract visitors, and convert leads into customers.',
+        'Professional website design and development services to build your digital identity and grow your business online.',
+      icon: Globe, // You can use a better icon if available, like Code or Monitor
+
+      services: [
+        {
+          icon: Globe,
+          title: 'Business Websites',
+          description:
+            'Custom-designed responsive websites that represent your brand, attract visitors, and convert leads into customers.',
           color: '#0ba5b0ff',
-        features: [
-        'Corporate & Portfolio Sites',
-        'Mobile-First Responsive Design',
-        'SEO-Optimized Pages',
-        'Fast and Secure Hosting Setup',
+          features: [
+            'Corporate & Portfolio Sites',
+            'Mobile-First Responsive Design',
+            'SEO-Optimized Pages',
+            'Fast and Secure Hosting Setup',
+          ],
+        },
+        {
+          icon: Globe,
+          title: 'E-Commerce Websites',
+          description:
+            'Complete online store solutions that help you sell products and manage orders with ease.',
+          color: '#0ba5b0ff',
+          features: [
+            'Product Catalog & Cart System',
+            'Payment Gateway Integration',
+            'Inventory & Order Management',
+            'User-Friendly Admin Dashboard',
+          ],
+        },
+        {
+          icon: Globe,
+          title: 'Portfolio & Creative Websites',
+          description:
+            'Stylish and engaging portfolio sites for artists, designers, and creators to showcase their best work.',
+          color: '#0ba5b0ff',
+          features: [
+            'Dynamic Gallery Layouts',
+            'Media-Ready Design',
+            'Social Media Integration',
+            'Custom Branding Options',
+          ],
+        },
+        {
+          icon: Globe,
+          title: 'Landing Pages & One-Page Sites',
+          description:
+            'High-converting landing pages designed for marketing campaigns and product promotions.',
+          color: '#0ba5b0ff',
+          features: [
+            'Conversion-Focused Layouts',
+            'Call-to-Action Optimization',
+            'Lead Form Integration',
+            'Analytics & Tracking Setup',
+          ],
+        },
+        {
+          icon: Globe,
+          title: 'Website Maintenance & Support',
+          description:
+            'Keep your site running smoothly with ongoing updates, backups, and performance optimization.',
+          color: '#0ba5b0ff',
+          features: [
+            'Regular Content Updates',
+            'Security Monitoring',
+            'Backup & Restore Solutions',
+            'Speed Optimization',
+          ],
+        },
       ],
     },
-    {
-      icon: Globe,
-      title: 'E-Commerce Websites',
-      description:
-        'Complete online store solutions that help you sell products and manage orders with ease.',
-        color: '#0ba5b0ff',
-      features: [
-        'Product Catalog & Cart System',
-        'Payment Gateway Integration',
-        'Inventory & Order Management',
-        'User-Friendly Admin Dashboard',
-      ],
-    },
-    {
-      icon: Globe,
-      title: 'Portfolio & Creative Websites',
-      description:
-        'Stylish and engaging portfolio sites for artists, designers, and creators to showcase their best work.',
-        color: '#0ba5b0ff',
-      features: [
-        'Dynamic Gallery Layouts',
-        'Media-Ready Design',
-        'Social Media Integration',
-        'Custom Branding Options',
-      ],
-    },
-    {
-      icon: Globe,
-      title: 'Landing Pages & One-Page Sites',
-      description:
-        'High-converting landing pages designed for marketing campaigns and product promotions.',
-        color: '#0ba5b0ff',
-      features: [
-        'Conversion-Focused Layouts',
-        'Call-to-Action Optimization',
-        'Lead Form Integration',
-        'Analytics & Tracking Setup',
-      ],
-    },
-    {
-      icon: Globe,
-      title: 'Website Maintenance & Support',
-      description:
-        'Keep your site running smoothly with ongoing updates, backups, and performance optimization.',
-        color: '#0ba5b0ff',
-      features: [
-        'Regular Content Updates',
-        'Security Monitoring',
-        'Backup & Restore Solutions',
-        'Speed Optimization',
-      ],
-    },
-  ],
-},
 
     google: {
       title: 'Google Services',
@@ -199,12 +199,12 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
         },
       ],
     },
-    
-      digital: {
-          title: 'Digital Media',
-          description: 'Creative content and digital media management solutions',
-          icon: Video,
-          services: [
+
+    digital: {
+      title: 'Digital Media',
+      description: 'Creative content and digital media management solutions',
+      icon: Video,
+      services: [
         {
           icon: Edit,
           title: 'Video Editing for Businesses',
@@ -243,8 +243,12 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
           <h1 className="text-4xl md:text-5xl font-bold text-black mb-6">
             Our Services
           </h1>
-          <p className="text-xl text-black max-w-3xl mx-auto">
-            Comprehensive digital and IT solutions tailored to meet your business needs. From infrastructure to digital marketing, we've got you covered.
+          <p className="text-lg md:text-xl text-black leading-relaxed w-full">
+            We deliver comprehensive digital and IT solutions tailored to meet your business needs.
+            Our services cover everything from IT infrastructure and website development to digital marketing and technical support.
+            Each solution is crafted with a focus on performance, reliability, and growth.
+            We work closely with you to understand your goals and provide the right strategy.
+            Your success is the foundation of every service we offer.
           </p>
         </div>
 
@@ -256,85 +260,84 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
               <button
                 key={key}
                 onClick={() => setSelectedCategory(key)}
-                className={`flex items-center space-x-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-                  selectedCategory === key
+                className={`flex items-center space-x-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${selectedCategory === key
                     ? 'bg-black text-white shadow-xl'
                     : 'bg-white text-gray-700 hover:bg-gray-200 shadow-lg'
-                }`}
+                  }`}
               >
                 <IconComponent className="w-6 h-6" />
                 <span>{category.title}</span>
               </button>
             );
           })}
-        <QuoteModal
-  isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  serviceName={selectedService}
-  onSubmit={(data) => {
-    console.log('Form submitted:', data, 'Service:', selectedService);
-    alert('Thank you! We’ll contact you soon.');
-  }}
-  />
-    </div>
- {/*Showcase Section */}
-{selectedCategory === 'website' && (
-  <div id="portfolioSection" className="mb-20 text-center">
+          <QuoteModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            serviceName={selectedService}
+            onSubmit={(data) => {
+              console.log('Form submitted:', data, 'Service:', selectedService);
+              alert('Thank you! We’ll contact you soon.');
+            }}
+          />
+        </div>
+        {/*Showcase Section */}
+        {selectedCategory === 'website' && (
+          <div id="portfolioSection" className="mb-20 text-center">
 
-    <h2 className="text-3xl font-bold text-black mb-8">Our Recent Website Projects</h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-  {websiteProjects.map((project, i) => (
-    <a
-      key={i}
-      href={project.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block"
-    >
-      <img
-        src={project.img}
-        alt={`Website Project ${i + 1}`}
-        className="rounded-xl shadow-md hover:scale-105 transition-all duration-300 w-full object-cover"
-      />
-    </a>
-  ))}
-</div>
-    <div className="max-w-4xl mx-auto rounded-xl overflow-hidden shadow-lg">
-      {/*<iframe
+            <h2 className="text-3xl font-bold text-black mb-8">Our Recent Website Projects</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+              {websiteProjects.map((project, i) => (
+                <a
+                  key={i}
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <img
+                    src={project.img}
+                    alt={`Website Project ${i + 1}`}
+                    className="rounded-xl shadow-md hover:scale-105 transition-all duration-300 w-full object-cover"
+                  />
+                </a>
+              ))}
+            </div>
+            <div className="max-w-4xl mx-auto rounded-xl overflow-hidden shadow-lg">
+              {/*<iframe
         width="100%"
         height="400"
         src="/11.mp4"
         title="Website Showcase"
         allowFullScreen
       ></iframe>*/}
-    </div>
-  </div>
-)} 
+            </div>
+          </div>
+        )}
 
-{selectedCategory === 'google' && (
-  <div className="mb-20 text-center">
-    <h2 className="text-3xl font-bold mb-8">Google Virtual Tour Examples</h2>
-     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      {['/images/vt1.png', '/images/vt5.mp4', '/images/vt2.png', '/images/vt4.png', '/images/vt3.png'].map((img, i) => (
-        <img
-          key={i}
-          src={img}
-          alt={`Google Virtual Tour ${i + 1}`}
-          className="rounded-xl shadow-md hover:scale-105 transition-all duration-300"
-        />
-      ))}
-    </div>
-    {/*<iframe
+        {selectedCategory === 'google' && (
+          <div className="mb-20 text-center">
+            <h2 className="text-3xl font-bold mb-8">Google Virtual Tour Examples</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              {['/images/vt1.png', '/images/vt5.mp4', '/images/vt2.png', '/images/vt4.png', '/images/vt3.png'].map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  alt={`Google Virtual Tour ${i + 1}`}
+                  className="rounded-xl shadow-md hover:scale-105 transition-all duration-300"
+                />
+              ))}
+            </div>
+            {/*<iframe
       className="w-full max-w-4xl mx-auto h-96 rounded-xl shadow-lg"
       src="https://www.youtube.com/embed/VbfpW0pbvaU"
       title="Google Service Demo"
       allowFullScreen
     ></iframe>*/}
-  </div>
-)}
-{selectedCategory === 'digital' && (
-  <div className="mb-20 text-center">
-    {/* <h2 className="text-3xl font-bold mb-8">Our YouTube & Social Media Work</h2>
+          </div>
+        )}
+        {selectedCategory === 'digital' && (
+          <div className="mb-20 text-center">
+            {/* <h2 className="text-3xl font-bold mb-8">Our YouTube & Social Media Work</h2>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
       {['/images/yt1.jpg', '/images/yt2.jpg', '/images/yt3.jpg', '/images/yt4.jpg'].map((img, i) => (
         <img
@@ -346,18 +349,18 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
       ))}
     </div> */}
 
-    {/*<iframe
+            {/*<iframe
       className="w-full max-w-4xl mx-auto h-96 rounded-xl shadow-lg"
       src="https://www.youtube.com/embed/9bZkp7q19f0"
       title="Digital Media Highlights"
       allowFullScreen
     ></iframe>*/}
-  </div>
-)}
+          </div>
+        )}
         {/* Category Header */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-50 h-50 bg-gradient-to-r from-white-600 to-blue-700 rounded-2xl mb-6">
-            
+
             {React.createElement(currentCategory.icon, { className: "w-10 h-10 text-black" })}
 
           </div>
@@ -372,78 +375,78 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           {currentCategory.services.map((service, index) => {
-  const IconComponent = service.icon;
+            const IconComponent = service.icon;
 
-  return (
-    <div
-      key={index}
-      className="service-item relative"
-      style={{ "--color": service.color ?? "#0ba5b0ff" } as React.CSSProperties}
-    >
-      <div className="service-layer">
-
-        {/* Icon + Title */}
-        <div className="flex items-center mb-6">
-          <div
-            className="w-14 h-14 rounded-xl flex items-center justify-center mr-4 text-white"
-            style={{ backgroundColor: service.color ?? "#684022ff" }}
-          >
-            <IconComponent className="w-7 h-7" />
-          </div>
-
-          <h3
-            className="text-xl font-bold"
-            style={{ color: service.color ?? "#633d1fff" }}
-          >
-            {service.title}
-          </h3>
-        </div>
-
-        {/* Description */}
-        <p className="text-black mb-6 leading-relaxed">
-          {service.description}
-        </p>
-
-        {/* Features */}
-        <div className="space-y-3 mb-6">
-          {service.features.map((feature, featureIndex) => (
-            <div key={featureIndex} className="flex items-center space-x-3">
+            return (
               <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: service.color ?? "#684022ff" }}
-              ></div>
-              <span className="text-gray-800">{feature}</span>
-            </div>
-          ))}
-        </div>
+                key={index}
+                className="service-item relative"
+                style={{ "--color": service.color ?? "#0ba5b0ff" } as React.CSSProperties}
+              >
+                <div className="service-layer">
 
-        {/* Buttons */}
-        <div className="flex space-x-4 mt-6">
-          <button
-            onClick={() => {
-              setSelectedService(service.title);
-              setIsModalOpen(true);
-            }}
-            className="px-5 py-2 bg-gray-600 text-white rounded-lg hover:bg-black transition-all"
-          >
-            Get Quote
-          </button>
+                  {/* Icon + Title */}
+                  <div className="flex items-center mb-6">
+                    <div
+                      className="w-14 h-14 rounded-xl flex items-center justify-center mr-4 text-white"
+                      style={{ backgroundColor: service.color ?? "#684022ff" }}
+                    >
+                      <IconComponent className="w-7 h-7" />
+                    </div>
 
-          <button className="px-6 py-2 border border-gray-600 text-white-600 rounded-lg font-semibold hover:bg-blue-50 transition-all">
-            Learn More
-          </button>
-        </div>
+                    <h3
+                      className="text-xl font-bold"
+                      style={{ color: service.color ?? "#633d1fff" }}
+                    >
+                      {service.title}
+                    </h3>
+                  </div>
 
-      </div>
+                  {/* Description */}
+                  <p className="text-black mb-6 leading-relaxed">
+                    {service.description}
+                  </p>
 
-      {/* Step Number 
+                  {/* Features */}
+                  <div className="space-y-3 mb-6">
+                    {service.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center space-x-3">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: service.color ?? "#684022ff" }}
+                        ></div>
+                        <span className="text-gray-800">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex space-x-4 mt-6">
+                    <button
+                      onClick={() => {
+                        setSelectedService(service.title);
+                        setIsModalOpen(true);
+                      }}
+                      className="px-5 py-2 bg-gray-600 text-white rounded-lg hover:bg-black transition-all"
+                    >
+                      Get Quote
+                    </button>
+
+                    <button className="px-6 py-2 border border-gray-600 text-white-600 rounded-lg font-semibold hover:bg-blue-50 transition-all">
+                      Learn More
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Step Number 
       <h4 className="text-white text-center py-3 font-semibold text-lg">
         Step {index + 1 < 10 ? `0${index + 1}` : index + 1}
       </h4>*/}
-    </div>
-  );
-})}
-    </div>
+              </div>
+            );
+          })}
+        </div>
 
         {/* Call to Action */}
         <div className="bg-white-600 text-black rounded-2xl p-12 text-center">
@@ -455,26 +458,26 @@ const Services: React.FC<ServicesProps> = ({ defaultCategory = 'website', setCur
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
 
-  {/* 👉 Redirect to Contact Page */}
-  <button
-    onClick={() => setCurrentPage && setCurrentPage('contact')}
-    className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
-  >
-    Discuss Your Needs
-  </button>
+            {/* 👉 Redirect to Contact Page */}
+            <button
+              onClick={() => setCurrentPage && setCurrentPage('contact')}
+              className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
+            >
+              Discuss Your Needs
+            </button>
 
-  {/* 👉 Scroll to Website Projects Section */}
-  <button
-    onClick={() => {
-      const section = document.getElementById("portfolioSection");
-      if (section) section.scrollIntoView({ behavior: "smooth" });
-    }}
-    className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
-  >
-    View Portfolio
-  </button>
+            {/* 👉 Scroll to Website Projects Section */}
+            <button
+              onClick={() => {
+                const section = document.getElementById("portfolioSection");
+                if (section) section.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl"
+            >
+              View Portfolio
+            </button>
 
-</div>
+          </div>
 
         </div>
       </div>

@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 const Home = ({ onSelectServiceCategory }) => {
 
   if (!onSelectServiceCategory) {
-  onSelectServiceCategory = () => {};
-}
+    onSelectServiceCategory = () => { };
+  }
   const services = [
     {
       icon: Monitor,
@@ -75,48 +75,48 @@ const Home = ({ onSelectServiceCategory }) => {
 
   return (
     <div className="space-y-0">
-   {/* HERO SECTION WITH FULL BACKGROUND IMAGE + CENTER VIDEO */}
-<section
-  className="relative flex flex-col items-center justify-center text-white overflow-hidden"
-  style={{
-    backgroundImage: "url('/images/HomeBG.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    height: "100vh",
-  }}
->
-  {/* Soft overlay for text visibility */}
-  <div className="absolute inset-0 bg-black/40"></div>
+      {/* HERO SECTION WITH FULL BACKGROUND IMAGE + CENTER VIDEO */}
+      <section
+        className="relative flex flex-col items-center justify-center text-white overflow-hidden"
+        style={{
+          backgroundImage: "url('/images/HomeBG.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          height: "100vh",
+        }}
+      >
+        {/* Soft overlay for text visibility */}
+        <div className="absolute inset-0 bg-black/40"></div>
 
-  {/* Video inside the dark center area */}
-<div className="relative z-20 w-full max-w-2xl px-4 mt-5 translate-y-[30px]">
-  <div className="aspect-video w-full rounded-xl overflow-hidden shadow-2xl border border-white/10">
-    <video
-      className="w-full h-full object-cover"
-      autoPlay
-      loop
-      muted
-      playsInline
-      src="/10.mp4"
-    ></video>
-  </div>
-</div>
+        {/* Video inside the dark center area */}
+        <div className="relative z-20 w-full max-w-2xl px-4 mt-5 translate-y-[30px]">
+          <div className="aspect-video w-full rounded-xl overflow-hidden shadow-2xl border border-white/10">
+            <video
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              src="/10.mp4"
+            ></video>
+          </div>
+        </div>
 
-  {/* Text content below video */}
-  <div className="relative z-10 text-center px-4 mt-10">
-    <h1 className="text-2xl md:text-5xl lg:text-5xl font-extrabold leading-tight mb-2">
-      Empowering Businesses
-      <span className="bg-gradient-to-r from-blue-300 to-white bg-clip-text text-transparent">
-        {' '}with Digital Innovation
-      </span>
-    </h1>
+        {/* Text content below video */}
+        <div className="relative z-10 text-center px-4 mt-10">
+          <h1 className="text-2xl md:text-5xl lg:text-5xl font-extrabold leading-tight mb-2">
+            Empowering Businesses
+            <span className="bg-gradient-to-r from-blue-300 to-white bg-clip-text text-transparent">
+              {' '}with Digital Innovation
+            </span>
+          </h1>
 
-    <p className="text-base md:text-lg lg:text-2xl text-blue-100 max-w-4xl mx-auto mb-5 leading-relaxed">
-      Digital IMALAG provides world-class IT and digital solutions — from websites
-      to infrastructure and marketing — for growth-ready businesses.
-    </p>
+          <p className="text-base md:text-lg lg:text-2xl text-blue-100 max-w-4xl mx-auto mb-5 leading-relaxed">
+            Digital IMALAG provides world-class IT and digital solutions — from websites
+            to infrastructure and marketing — for growth-ready businesses.
+          </p>
 
-    {/*<div className="flex flex-col sm:flex-row gap-5 justify-center">
+          {/*<div className="flex flex-col sm:flex-row gap-5 justify-center">
       <a
         href="/services"
         className="bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-xl flex items-center justify-center space-x-2"
@@ -131,8 +131,8 @@ const Home = ({ onSelectServiceCategory }) => {
         Get in Touch
       </a>
     </div> */}
-  </div>
-</section>
+        </div>
+      </section>
 
 
 
@@ -143,45 +143,49 @@ const Home = ({ onSelectServiceCategory }) => {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Our Core Services
             </h2>
-            <p className="text-xl text-white max-w-3xl mx-auto">
-              Innovative digital & IT solutions designed to accelerate your
-              brand’s growth, efficiency and customer reach.
+            <p className="text-lg md:text-xl text-white leading-relaxed w-full">
+              We provide innovative digital and IT solutions designed to accelerate your brand's growth, improve operational efficiency, and expand your customer reach.
+              Our website and web application development services focus on creating modern, responsive, and performance-driven digital experiences.
+              Through our Google services, we help businesses enhance visibility, credibility, and engagement across key Google platforms.
+              Our IT services ensure reliable infrastructure, seamless operations, and secure technical support tailored to your business needs.
+              With our digital media solutions, we strengthen your online presence through creative content, branding, and audience-focused strategies.
+              At Digital IMALAG, every service is crafted to deliver measurable results and long-term value.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-  {services.map((service, index) => {
-    const Icon = service.icon;
+            {services.map((service, index) => {
+              const Icon = service.icon;
 
-    // Map each title to the correct service category
-const title = service.title.toLowerCase();
+              // Map each title to the correct service category
+              const title = service.title.toLowerCase();
 
-let categoryKey = 'website';
-if (title.includes('website')) categoryKey = 'website';
-else if (title.includes('google')) categoryKey = 'google';
-else if (title.includes('it') || title.includes('infrastructure')) categoryKey = 'it';
-else if (title.includes('digital') || title.includes('media')) categoryKey = 'digital'; // ✅ Updated
+              let categoryKey = 'website';
+              if (title.includes('website')) categoryKey = 'website';
+              else if (title.includes('google')) categoryKey = 'google';
+              else if (title.includes('it') || title.includes('infrastructure')) categoryKey = 'it';
+              else if (title.includes('digital') || title.includes('media')) categoryKey = 'digital'; // ✅ Updated
 
 
-    return (
-      <motion.div
-        key={index}
-        onClick={() => onSelectServiceCategory(categoryKey)} // 👈 handle click instead of href
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.98 }}
-        className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl border border-gray-100 flex flex-col items-center text-center transition-all cursor-pointer"
-      >
-        <div className="w-16 h-16 bg-gradient-to-r from-blue-800 to-white-200 rounded-lg flex items-center justify-center mb-6">
-          <Icon className="text-white w-8 h-8" />
-        </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          {service.title}
-        </h3>
-        <p className="text-blue-600 font-medium mb-2">{service.tagline}</p>
-        <p className="text-gray-600 leading-relaxed">{service.description}</p>
-      </motion.div>
-    );
-  })}
+              return (
+                <motion.div
+                  key={index}
+                  onClick={() => onSelectServiceCategory(categoryKey)} // 👈 handle click instead of href
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl border border-gray-100 flex flex-col items-center text-center transition-all cursor-pointer"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-800 to-white-200 rounded-lg flex items-center justify-center mb-6">
+                    <Icon className="text-white w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-blue-600 font-medium mb-2">{service.tagline}</p>
+                  <p className="text-gray-600 leading-relaxed">{service.description}</p>
+                </motion.div>
+              );
+            })}
 
           </div>
         </div>
@@ -240,7 +244,7 @@ else if (title.includes('digital') || title.includes('media')) categoryKey = 'di
             Ready to Transform Your Digital Presence?
           </h2>
           <p className="text-xl text-white mb-8 leading-relaxed">
-            Let’s discuss how Digital IMALAG can help accelerate your business growth
+            Let's discuss how Digital IMALAG can help accelerate your business growth
             with modern, results-driven IT and digital solutions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

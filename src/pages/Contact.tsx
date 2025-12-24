@@ -18,9 +18,27 @@ const Contact: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here
+
+    const whatsappNumber = "919893567595"; // no +, no spaces
+
+    const message = `
+New Contact Form Message 👇
+
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Service: ${formData.service || "Not selected"}
+
+Message:
+${formData.message}
+  `;
+
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappURL, "_blank");
+
     setIsSubmitted(true);
     setTimeout(() => setIsSubmitted(false), 3000);
   };
@@ -71,8 +89,13 @@ const Contact: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Get In Touch
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Ready to transform your business with our digital and IT solutions? Let's discuss your project and explore how we can help you achieve your goals.
+          <p className="text-xl md:text-xl text-black leading-relaxed w-full">
+            Ready to take your business to the next level with smart <strong>Digital and IT Solutions</strong>?
+            At <strong>Digital IMALAG</strong>, we focus on understanding your needs and delivering solutions that truly work.
+            From website development to IT support and digital growth strategies, we're here to help.
+            Tell us about <strong>Your Project, ideas, or challenges</strong>.
+            Our experts will connect with you quickly and guide you every step of the way.
+            <strong> Let's create something impactful together</strong>.
           </p>
         </div>
 
