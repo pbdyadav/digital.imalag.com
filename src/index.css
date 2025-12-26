@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -9,9 +10,13 @@
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* User's original body style, updated to include font-family */
 body {
-  background-color: #1353d3; /* Tailwind's gray-100 */
+  font-family: 'Inter', sans-serif; /* Added for widget consistency */
+  background-color: #1353d3;
 }
+
 /* ------------------------------
    Real Folder Style Card Animation
    ------------------------------ */
@@ -123,4 +128,69 @@ body {
 
 .map-animated {
   animation: mapFadeUp 0.9s ease-out forwards;
+}
+
+/* ------------------------------
+   FLOATING CHAT WIDGET STYLES
+   ------------------------------ */
+
+/* The floating chat button container */
+.chat-button-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000; /* Ensure it stays above other content */
+}
+
+/* Chat window styling */
+.chat-window {
+    position: fixed;
+    bottom: 6rem; /* Positioned above the button */
+    right: 1.5rem;
+    width: 90vw;
+    max-width: 380px;
+    height: 70vh;
+    max-height: 550px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    transform: scale(0.95);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-window.open {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Style for the content area where the ElevenLabs agent will go */
+.chat-content {
+    flex-grow: 1;
+    overflow: hidden; /* Important for embedded content */
+    display: flex; /* Helps ensure the embedded script fills the space */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    .chat-window {
+        bottom: 0;
+        right: 0;
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        max-height: none;
+        border-radius: 0;
+    }
+    .chat-button-container {
+        bottom: 1rem;
+        right: 1rem;
+    }
 }

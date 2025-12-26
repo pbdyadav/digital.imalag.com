@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import Services from './pages/Services';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import Sitemap from "./pages/Sitemap";
-
+import Header from './components/Header.jsx'; // Corrected path
+import Footer from './components/Footer.jsx'; // Corrected path
+import Home from './pages/Home.jsx'; // Corrected path
+import Services from './pages/Services.jsx'; // Corrected path
+import About from './pages/About.jsx'; // Corrected path
+import Contact from './pages/Contact.jsx'; // Corrected path
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx"; // Corrected path
+import TermsOfService from "./pages/TermsOfService.jsx"; // Corrected path
+import Sitemap from "./pages/Sitemap.jsx"; // Corrected path
+import ChatWidget from './components/ChatWidget.jsx'; // <-- 1. IMPORT THE WIDGET (Corrected path)
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -62,6 +62,9 @@ function App() {
       <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />
       <main>{renderPage()}</main>
       <Footer setCurrentPage={setCurrentPage} />
+      
+      {/* 2. INCLUDE THE WIDGET HERE */}
+      <ChatWidget />
     </div>
   );
 }
