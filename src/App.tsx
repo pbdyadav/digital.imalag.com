@@ -8,7 +8,8 @@ import Contact from './pages/Contact.jsx'; // Corrected path
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx"; // Corrected path
 import TermsOfService from "./pages/TermsOfService.jsx"; // Corrected path
 import Sitemap from "./pages/Sitemap.jsx"; // Corrected path
-import ChatWidget from './components/ChatWidget.jsx'; // <-- 1. IMPORT THE WIDGET (Corrected path)
+//import ChatWidget from './components/ChatWidget.jsx'; // <-- 1. IMPORT THE WIDGET (Corrected path)
+import GeminiChatWidget from './components/GeminiChatWidget.jsx';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -63,8 +64,9 @@ function App() {
       <main>{renderPage()}</main>
       <Footer setCurrentPage={setCurrentPage} />
       
-      {/* 2. INCLUDE THE WIDGET HERE */}
-      <ChatWidget />
+      {/* 2. INCLUDE THE WIDGET HERE 
+      <ChatWidget /> */}
+      <GeminiChatWidget />
     </div>
   );
 }
