@@ -11,6 +11,7 @@ import Sitemap from "./pages/Sitemap.jsx"; // Corrected path
 //import ChatWidget from './components/ChatWidget.jsx'; // <-- 1. IMPORT THE WIDGET (Corrected path)
 import GeminiChatWidget from './components/GeminiChatWidget.jsx';
 
+
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedServiceCategory, setSelectedServiceCategory] = useState('website'); // 👈 NEW
@@ -67,6 +68,7 @@ function App() {
       {/* 2. INCLUDE THE WIDGET HERE 
       <ChatWidget /> */}
       <GeminiChatWidget />
+      
     </div>
   );
 }

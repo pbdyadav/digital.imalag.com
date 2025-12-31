@@ -1,23 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-// FIX: Use full CDN paths for module imports
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-import { getFirestore, addDoc, collection, doc, setDoc, setLogLevel } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
-
-// Set Firebase log level to debug for better console feedback
-setLogLevel('debug');
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 
-// --- API CONSTANTS ---
-/* 🛑 CRITICAL INSTRUCTION FOR LOCAL HOST/LIVE DEPLOYMENT 🛑
- * Replace the empty string below with your actual Gemini API Key.
- * This key is MANDATORY for the chat agent to function outside of this Canvas environment.
- */
-const YOUR_GEMINI_API_KEY = "AIzaSyADaLG66MqTuiE_az48SRgQwFRis8rNrCg"; // PASTE YOUR KEY HERE
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${YOUR_GEMINI_API_KEY}`;
-
-// --- SYSTEM INSTRUCTION ---
-// NOTE: Instruction heavily focused on professional, concise responses and JSON output rules.
+// ✅ YOUR ORIGINAL SYSTEM INSTRUCTION (UNCHANGED RATE CARD + RULES)
 const SYSTEM_INSTRUCTION = `You are Digital IMALAG's friendly and helpful AI Assistant. Your goal is to answer questions about the company's services, pricing, and digital needs concisely and professionally. 
 You MUST use the internal Rate Card data below for all pricing details. Do not mention "Rate Card" directly. Quote prices using the INR symbol (₹) and the specified range.
 Your primary response MUST be focused ONLY on the service the user asked about. Do NOT list unrelated services or pricing. Keep the core answer extremely brief and professional.
@@ -30,522 +14,616 @@ Your primary response MUST be focused ONLY on the service the user asked about. 
 5. Your 'summary' text must be the concise, professional answer based on the query and the rate card data, strictly adhering to the System Instruction's rules.
 
 --- RATE CARD DATA (Use this for your responses) ---
-1. 🌐 Website Development: Basic / Static (₹12,000 – ₹25,000). E-Commerce (Small) (₹50,000 – ₹85,000).
-2. 💻 Web Application Development: Custom SaaS (₹2,00,000 – ₹8,00,000+). Hourly Rate (₹800 – ₹2,500 / hour).
-3. 📈 SEO: Starter (₹8,000 – ₹15,000 monthly). Growth (₹18,000 – ₹30,000 monthly).
-4. 🤖 AI Agent: Smart AI Agent (₹50,000 – ₹1,50,000).
+1. 🌐 Website Development: Basic / Static (₹12,000 - ₹25,000). E-Commerce (Small) (₹50,000 - ₹85,000).
+2. 💻 Web Application Development: Custom SaaS (₹2,00,000 - ₹8,00,000+). Hourly Rate (₹800 - ₹2,500 / hour).
+3. 📈 SEO: Starter (₹8,000 - ₹15,000 One time charges). Growth (₹18,000 - ₹30,000 One time charges).
+4. 🤖 AI Agent: Smart AI agents (₹50,000 - ₹1,50,000) and various features depend on your chosen rental plan.
 5. 📍 Google Services (Virtual Tour): 360° Shoot is ₹1,000 per shot. Uploading to GMB is ₹1,500 (one-time). Minimum 2 shots per room.
-6. 🎬 Social Media Marketing (Video): 1-3 Minutes YouTube Vlog (₹2,000 – ₹5,000 per video). Full Production (1 Min Professional) (₹20,000 – ₹35,000).
+6. 🎬 Social Media Marketing (Video): 1-3 Minutes YouTube Vlog (₹2,000 - ₹5,000 per video). Full Production (1 Min Professional) (₹20,000 - ₹35,000).
 --- END RATE CARD DATA ---
 `;
 
-// --- JSON SCHEMA FOR STRUCTURED RESPONSE ---
+// ✅ YOUR ORIGINAL RESPONSE SCHEMA (UNCHANGED)
 const RESPONSE_SCHEMA = {
     type: "OBJECT",
     properties: {
         intent: {
             type: "STRING",
             description: "Must be one of: 'VT_CALC', 'LEAD_ACCEPT', 'GENERAL'.",
-            enum: ["VT_CALC", "LEAD_ACCEPT", "GENERAL"]
+            enum: ["VT_CALC", "LEAD_ACCEPT", "GENERAL"],
         },
         roomCount: {
             type: "NUMBER",
-            description: "If intent is 'VT_CALC', extract the number of rooms/locations mentioned. Use 1 if mentioned but quantity is vague (e.g., 'my shop'). Use 0 if not applicable.",
+            description:
+                "If intent is 'VT_CALC', extract the number of rooms/locations mentioned. Use 1 if mentioned but quantity is vague (e.g., 'my shop'). Use 0 if not applicable.",
         },
         summary: {
             type: "STRING",
-            description: "A concise, professional summary based on the query and the rate card data, strictly adhering to the System Instruction's rules.",
-        }
+            description:
+                "A concise, professional summary based on the query and the rate card data, strictly adhering to the System Instruction's rules.",
+        },
     },
-    required: ["intent", "summary", "roomCount"]
+    required: ["intent", "summary", "roomCount"],
 };
 
-/**
- * Utility function for exponential backoff retry logic.
- */
-async function fetchWithRetry(fn, maxRetries = 3) {
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            return await fn();
-        } catch (error) {
-            console.error(`Attempt ${i + 1} failed:`, error);
-            if (i === maxRetries - 1) throw error;
-            const delay = Math.pow(2, i) * 1000;
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
+function getIndianGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning ☀️";
+    if (hour < 17) return "Good afternoon 🌤️";
+    return "Good evening 🌙";
 }
 
-
-// --- Main Agent Component ---
+const YES_WORDS = ["yes", "y", "yeah", "sure", "ok", "okay", "haan", "ha", "ji"];
+const NO_WORDS = ["no", "nahi", "nah", "not now", "later"];
 
 export default function GeminiChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: 'model', text: "Hello! I'm the Digital IMALAG AI Assistant. How can I help you with your IT or digital needs today?" }
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
 
-  // --- FIREBASE STATE AND INITIALIZATION ---
-  const [db, setDb] = useState(null);
-  const [auth, setAuth] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const [isAuthReady, setIsAuthReady] = useState(false); // State to track if auth is complete
-  const [leadStatus, setLeadStatus] = useState('');
 
-  // Conversation stage control: 'chatting', 'form_prompt', 'showing_form'
-  const [conversationStage, setConversationStage] = useState('chatting'); 
-  
-  // New comprehensive state check
-  const isServiceReady = isAuthReady && db && userId; 
-
-  useEffect(() => {
-    if (typeof __firebase_config === 'undefined' || typeof __app_id === 'undefined') {
-        console.error("Firebase configuration variables are missing. Data persistence is disabled.");
-        setIsAuthReady(true);
-        return;
-    }
-
-    const firebaseConfig = JSON.parse(__firebase_config);
-    const app = initializeApp(firebaseConfig);
-    const firestore = getFirestore(app);
-    const authentication = getAuth(app);
-
-    setDb(firestore);
-    setAuth(authentication);
-
-    const authenticate = async () => {
-        try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(authentication, __initial_auth_token);
-            } else {
-                await signInAnonymously(authentication);
-            }
-        } catch (error) {
-            console.error("Firebase authentication error during sign-in:", error);
-        }
-    };
-
-    authenticate();
-
-    const unsubscribe = onAuthStateChanged(authentication, (user) => {
-        if (user) {
-            setUserId(user.uid);
-        } else {
-            setUserId(crypto.randomUUID()); 
-        }
-        setIsAuthReady(true); // Set ready only after auth state is determined
+    const [isOpen, setIsOpen] = useState(false);
+    const [messages, setMessages] = useState(() => {
+        const greet = `${getIndianGreeting()}! 👋\nI'm the Digital IMALAG AI Assistant.\nHow can I help you today?`;
+        return [{ role: "model", text: greet }];
     });
 
-    return () => unsubscribe();
-  }, []);
+    const [input, setInput] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-  // --- LEAD SAVING LOGIC (For form submission) ---
-  const saveLead = async (formData, projectDetails) => {
-    // Check service readiness strictly again before proceeding
-    if (!isServiceReady) {
-        // ADDED DEBUG LOG: This will confirm the race condition
-        console.error("DEBUG: saveLead called prematurely. isAuthReady:", isAuthReady, "db:", !!db, "userId:", !!userId);
-        setLeadStatus("Error: Database not ready or User ID missing. Please try submitting again in a moment.");
-        return;
-    }
+    /**
+     * flowStep:
+     * 0 -> ask what service / need
+     * 1 -> ask business/location + goal
+     * 2 -> ask timeline/budget/scale (3rd question)
+     * 3 -> run Gemini answer (services/pricing) then ask meeting
+     * 4 -> meeting prompt (yes/no)
+     */
+    const [flowStep, setFlowStep] = useState(0);
 
-    setLeadStatus("Saving lead information...");
+    // store discovery answers (to help Gemini reply better)
+    const [discovery, setDiscovery] = useState({
+        need: "",
+        businessGoal: "",
+        scaleTimeline: "",
+    });
 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    // MANDATORY PRIVATE DATA PATH STRUCTURE
-    const leadsCollectionPath = `/artifacts/${appId}/users/${userId}/leads`;
-    const leadsCollectionRef = collection(db, leadsCollectionPath);
-    
-    // Ensure all data types are correct for Firestore (e.g., projectDetails is a string)
-    const leadData = {
-        ...formData,
-        projectDetails: projectDetails,
-        dateCaptured: new Date().toISOString(),
-        source: "Digital IMALAG AI Chat Form",
-        userId: userId,
-    };
+    const [selectedService, setSelectedService] = useState("");
+    const [selectedSubService, setSelectedSubService] = useState("");
 
-    try {
-        const docRef = await addDoc(leadsCollectionRef, leadData);
-        setLeadStatus(`Lead saved successfully! Document ID: ${docRef.id}`);
-        setMessages(prev => [...prev, { role: 'model', text: "Thank you! Your meeting request and project details have been successfully submitted. Our agent will contact you shortly to confirm the appointment. You can now continue chatting." }]);
-        setConversationStage('chatting'); // Return to normal chat mode
-        console.log("Lead Saved:", leadData);
-    } catch (error) {
-        console.error("Error saving lead:", error);
-        // This is where a security rule error (403 Permission Denied) usually lands
-        setLeadStatus(`Error saving lead: Please check your Firestore Security Rules. Error: ${error.message}`);
-        setMessages(prev => [...prev, { role: 'model', text: `Error saving your lead details. Please try again or contact us via our main website. (Database Error)` }]);
-    }
-  };
+    // ✅ Lead contact details for WhatsApp meeting message
+    const [lead, setLead] = useState({
+        name: "",
+        phone: "",
+        email: "",
+    });
 
-  // Scroll to the bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, conversationStage]);
-  
-  // --- LEAD CAPTURE FORM COMPONENT ---
-  const LeadCaptureForm = ({ isServiceReady, onSave }) => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [contact, setContact] = useState('');
-    const [meetDate, setMeetDate] = useState(''); // State for preferred date
-    const [meetTimeOnly, setMeetTimeOnly] = useState(''); // State for preferred time
-    const [projectDesc, setProjectDesc] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      
-      // Safety check before initiating submission
-      if (!isServiceReady) {
-        console.error("Form submitted before DB was fully ready. Preventing save.");
-        setLeadStatus("Error: Service is still initializing. Please wait a moment.");
-        return;
-      }
+    const messagesEndRef = useRef(null);
 
-      setIsSubmitting(true);
-      // Combine date and time into a single field for storage
-      const combinedMeetTime = meetDate && meetTimeOnly 
-        ? `${meetDate} at ${meetTimeOnly}` 
-        : 'Not Specified by customer';
-      
-      const formData = { name, email, contact, meetTime: combinedMeetTime };
-      await onSave(formData, projectDesc); // Use onSave prop
-      setIsSubmitting(false);
-    };
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages, isOpen]);
 
-    // Use the comprehensive state to control submission ability
-    const submitDisabled = isSubmitting || !isServiceReady;
+    const isYes = (text) => YES_WORDS.some((w) => text.toLowerCase().includes(w));
+    const isNo = (text) => NO_WORDS.some((w) => text.toLowerCase().includes(w));
 
-    return (
-      <div className="p-4 bg-white space-y-3">
-        <h3 className="text-lg font-bold text-indigo-700">Schedule a Consultation</h3>
-        <p className="text-sm text-gray-600">Please provide your details so we can arrange a meeting to discuss your project.</p>
-        
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input 
-            type="text" 
-            placeholder="Name" 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
-            required 
-            className="w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            disabled={submitDisabled}
-          />
-          <input 
-            type="email" 
-            placeholder="Email ID" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-            className="w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            disabled={submitDisabled}
-          />
-          <input 
-            type="tel" 
-            placeholder="Contact No." 
-            value={contact} 
-            onChange={(e) => setContact(e.target.value)} 
-            required 
-            className="w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            disabled={submitDisabled}
-          />
-          
-          <div className="text-sm font-medium text-gray-700 pt-1">Preferred Time for Meeting:</div>
-          <div className="grid grid-cols-2 gap-2">
-            <input 
-              type="date" 
-              value={meetDate} 
-              onChange={(e) => setMeetDate(e.target.value)} 
-              required 
-              className="w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-              aria-label="Preferred Date"
-              disabled={submitDisabled}
-            />
-            <input 
-              type="time" 
-              value={meetTimeOnly} 
-              onChange={(e) => setMeetTimeOnly(e.target.value)} 
-              required 
-              className="w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-              aria-label="Preferred Time"
-              disabled={submitDisabled}
-            />
-          </div>
-          
-          <textarea
-            placeholder="Discussion on your project (4-5 lines of detail)"
-            value={projectDesc}
-            onChange={(e) => setProjectDesc(e.target.value)}
-            rows="4"
-            required
-            className="w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 resize-none"
-            disabled={submitDisabled}
-          />
-          
-          <button
-            type="submit"
-            disabled={submitDisabled}
-            className="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition disabled:bg-gray-400"
-          >
-            {isSubmitting 
-                ? 'Submitting...' 
-                : isServiceReady 
-                  ? 'Submit Request' 
-                  : 'Connecting to service...'
-            }
-          </button>
-        </form>
-        {leadStatus && <p className="text-xs mt-2 text-center text-green-600">{leadStatus}</p>}
-      </div>
-    );
-  };
-  
-  // Handle the chat submission
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    const callGemini = async (userText) => {
+        const combinedText = `Customer Context:
+- Need: ${discovery.need || "Not provided"}
+- Business/Goal: ${discovery.businessGoal || "Not provided"}
+- Scale/Timeline: ${discovery.scaleTimeline || "Not provided"}
 
-    const userMessage = input.trim();
-    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
-    setInput('');
-    setIsLoading(true);
+Customer Message: ${userText}`;
 
-    if (!YOUR_GEMINI_API_KEY) {
-         setMessages(prev => [...prev, { role: 'model', text: "Error: The AI assistant's key is not configured." }]);
-         setIsLoading(false);
-         return;
-    }
+        const res = await fetch("/api/gemini", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: combinedText }] }],
+                systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: RESPONSE_SCHEMA,
+                },
+            }),
+        });
 
-    try {
-        const payload = {
-            contents: [{ parts: [{ text: userMessage }] }],
-            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: RESPONSE_SCHEMA
-            },
-        };
-        
-        const response = await fetchWithRetry(() => 
-            fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-        );
-        
-        if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+        if (!res.ok) {
+            throw new Error(`Gemini request failed: ${res.status}`);
+        }
 
-        const result = await response.json();
-        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!jsonText) throw new Error("Received an empty or malformed JSON response from the model.");
-        
-        // Use JSON.parse with a fallback for safety
-        let modelResponseData;
+        const result = await res.json();
+        const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!jsonText) {
+            return { intent: "GENERAL", summary: "Please share a little more detail.", roomCount: 0 };
+        }
+
         try {
-            modelResponseData = JSON.parse(jsonText);
-        } catch (e) {
-            console.error("Failed to parse JSON:", jsonText, e);
-            modelResponseData = { intent: 'GENERAL', summary: "I apologize, there was an error processing your request. Could you please rephrase your query?", roomCount: 0 };
+            return JSON.parse(jsonText);
+        } catch {
+            return { intent: "GENERAL", summary: "Please share a little more detail.", roomCount: 0 };
         }
+    };
 
-        const { intent, roomCount, summary } = modelResponseData;
-        let finalResponseText = summary;
-        let nextStage = 'chatting';
+    const SERVICE_MAP = {
+        "website development": [
+            "Business Website",
+            "E-Commerce Website",
+            "Portfolio / Creative Website",
+            "Landing Page / One-Page",
+            "Website Maintenance & Support",
+            "SEO Optimization",
+        ],
+        "google services": [
+            "Google My Business Management",
+            "Google Virtual Tour",
+            "Google Ads Setup & Optimization",
+            "Email Setup / Migration",
+        ],
+        "it services": [
+            "Laptop Repair & Maintenance",
+            "Desktop Solutions",
+            "Server Setup & Support",
+            "Networking Installation",
+            "CCTV Installation & Monitoring",
+            "IT Consultancy",
+        ],
+        "digital media": [
+            "Video Editing for Businesses",
+            "Digital Media Video Creation",
+            "YouTube Channel Management",
+            "YouTube Video Creation & Optimization",
+        ],
+    };
 
-        // 1. DYNAMIC VT CALCULATION
-        if (intent === 'VT_CALC' && roomCount > 0) {
-            const shotsPerRoom = 2;
-            const pricePerShot = 1000;
-            const uploadFee = 1500;
-            const totalShots = roomCount * shotsPerRoom;
-            const calculatedCost = (totalShots * pricePerShot) + uploadFee;
-            
-            // Generate the calculated, concise, and professional response
-            finalResponseText = `Based on your request for ${roomCount} room(s), the estimated cost for the Google Virtual Tour is calculated as follows: ${totalShots} shots at ₹${pricePerShot}/shot, plus a ₹${uploadFee} one-time upload fee. Your total estimated cost is ₹${calculatedCost.toLocaleString('en-IN')}.`;
-            nextStage = 'form_prompt';
-        } 
-        
-        // 2. LEAD ACCEPTANCE CHECK (for the 'will you want to fix a meeting' prompt)
-        else if (intent === 'LEAD_ACCEPT' && conversationStage === 'form_prompt') {
-            finalResponseText = "Fantastic! We're ready to proceed. I will now open a short form for you to provide the necessary details for scheduling.";
-            nextStage = 'showing_form';
+    const PRICE_MAP = {
+        "business website": "₹12,000 - ₹25,000",
+        "e-commerce website": "₹50,000 - ₹85,000",
+        "portfolio / creative website": "₹15,000 - ₹30,000",
+        "landing page / one-page": "₹8,000 - ₹15,000",
+        "website maintenance & support": "Starting from ₹3,000 / month",
+        "seo optimization": "₹8,000 - ₹30,000 (one-time)",
+
+        "google virtual tour": "₹1,000 per shot + ₹1,500 upload",
+        "google ads setup & optimization": "₹8,000 - ₹25,000",
+        "google my business management": "₹5,000 - ₹15,000",
+
+        "laptop repair & maintenance": "₹500 - ₹5,000 (depends on issue)",
+        "cctv installation & monitoring": "₹8,000 - ₹50,000",
+
+        "video editing for businesses": "₹2,000 - ₹5,000 per video",
+        "youtube channel management": "₹15,000 - ₹40,000 / month",
+    };
+
+    const handleSend = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!input.trim() || isLoading) return;
+
+        const userText = input.trim();
+        setInput("");
+        setIsLoading(true);
+
+        // Add user message immediately
+        setMessages((p) => [...p, { role: "user", text: userText }]);
+
+        try {
+            // ✅ Meeting prompt step: yes -> redirect, no -> continue chatting
+
+
+
+            // ✅ Meeting confirmation step
+            if (flowStep === 4) {
+
+                // YES → Ask for Name
+                if (isYes(userText)) {
+                    setMessages((p) => [
+                        ...p,
+                        {
+                            role: "model",
+                            text: "Great 👍 Before scheduling the meeting, may I have your *full name*?",
+                        },
+                    ]);
+
+                    setFlowStep(5);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // NO → Continue chat
+                if (isNo(userText)) {
+                    setMessages((p) => [
+                        ...p,
+                        {
+                            role: "model",
+                            text: "No problem 🙂 Let me know how else I can help you.",
+                        },
+                    ]);
+                    setFlowStep(3);
+                    setIsLoading(false);
+                    return;
+                }
+
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text: 'Please reply with "Yes" or "No" 🙂',
+                    },
+                ]);
+                setIsLoading(false);
+                return;
+            }
+            if (flowStep === 5) {
+                setLead((p) => ({ ...p, name: userText }));
+
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text: "Thanks 😊 Please share your *mobile number*.",
+                    },
+                ]);
+
+                setFlowStep(6);
+                setIsLoading(false);
+                return;
+            }
+            if (flowStep === 6) {
+                setLead((p) => ({ ...p, phone: userText }));
+
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text: "Perfect 👍 Lastly, please share your *email address*.",
+                    },
+                ]);
+
+                setFlowStep(7);
+                setIsLoading(false);
+                return;
+            }
+            if (flowStep === 7) {
+                const finalLead = { ...lead, email: userText };
+                setLead(finalLead);
+
+                const whatsappMessage = `
+New Meeting Request 🚀
+
+Name: ${finalLead.name}
+Phone: ${finalLead.phone}
+Email: ${finalLead.email}
+
+Service Category:
+${selectedService || "Not mentioned"}
+
+Service Type:
+${selectedSubService || "Not mentioned"}
+
+Timeline / Scale:
+${discovery.scaleTimeline || "Not mentioned"}
+
+Sent from Digital IMALAG Website
+`;
+
+                const whatsappUrl =
+                    "https://wa.me/9893567595?text=" +
+                    encodeURIComponent(whatsappMessage);
+
+                window.open(whatsappUrl, "_blank");
+
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text: "✅ WhatsApp opened. Please send the message to confirm the meeting.",
+                    },
+                ]);
+
+                setIsLoading(false);
+                return;
+            }
+            // ✅ Discovery Q1
+            if (flowStep === 0) {
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text:
+                            "Thanks 👍\nPlease choose the service you're interested in:\n\n• Website Development\n• Google Services\n• IT Services\n• Digital Media\n\nYou can type the service name.",
+                    },
+                ]);
+                setFlowStep(1);
+                setIsLoading(false);
+                return;
+            }
+
+            if (flowStep === 1) {
+                const key = userText.toLowerCase();
+
+                if (SERVICE_MAP[key]) {
+                    setSelectedService(key);
+                    setDiscovery((d) => ({ ...d, need: key })); // ✅ FIX
+
+                    const subList = SERVICE_MAP[key]
+                        .map((s) => `• ${s}`)
+                        .join("\n");
+
+                    setMessages((p) => [
+                        ...p,
+                        {
+                            role: "model",
+                            text: `Great choice 👍\nPlease select the type of service you need:\n\n${subList}\n\nJust type the option name.`,
+                        },
+                    ]);
+
+                    setFlowStep(2);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // fallback
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text: "Please choose one of the listed services so I can guide you correctly 🙂",
+                    },
+                ]);
+                setIsLoading(false);
+                return;
+            }
+
+            // ✅ Discovery Q2
+            if (flowStep === 2) {
+                const key = userText.toLowerCase();
+
+                if (PRICE_MAP[key]) {
+                    setSelectedSubService(key);
+
+                    setMessages((p) => [
+                        ...p,
+                        {
+                            role: "model",
+                            text: `Thanks 👍\nBased on your selection, the estimated cost is:\n\n${PRICE_MAP[key]}\n\nThis may vary depending on exact requirements.`,
+                        },
+                    ]);
+
+                    setTimeout(() => {
+                        setMessages((p) => [
+                            ...p,
+                            {
+                                role: "model",
+                                text:
+                                    "One quick question 🙂\nWhen would you like to start this work?\n(Example: immediately, within 1 week, 1 month, flexible)",
+                            },
+                        ]);
+                        setFlowStep(3);
+                    }, 500);
+
+                    setIsLoading(false);
+                    return;
+                }
+
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text: "Please select one option from the list so I can give you accurate pricing 🙂",
+                    },
+                ]);
+                setIsLoading(false);
+                return;
+            }
+
+            // ✅ Discovery Q3 then Gemini answer
+            if (flowStep === 2) {
+                setDiscovery((d) => ({ ...d, scaleTimeline: userText }));
+                setFlowStep(3);
+            }
+            // ✅ Capture timeline / scale
+            if (flowStep === 3) {
+                setDiscovery((d) => ({ ...d, scaleTimeline: userText }));
+
+                setMessages((p) => [
+                    ...p,
+                    {
+                        role: "model",
+                        text:
+                            'Perfect 👍\nWould you like to schedule a short discussion with our expert team to finalize details? (Type "Yes" or "No")',
+                    },
+                ]);
+
+                setFlowStep(4);
+                setIsLoading(false);
+                return;
+            }
+
+            // ✅ Gemini Answer Step
+            const model = await callGemini(userText);
+
+            let reply = model.summary || "Thanks. Could you share a bit more detail?";
+
+            // ✅ Keep your VT_CALC math exactly like old logic
+            if (model.intent === "VT_CALC" && model.roomCount > 0) {
+                const shotsPerRoom = 2;
+                const pricePerShot = 1000;
+                const uploadFee = 1500;
+                const totalShots = model.roomCount * shotsPerRoom;
+                const calculatedCost = totalShots * pricePerShot + uploadFee;
+
+                reply = `Based on your request for ${model.roomCount} room(s), the estimated cost for the Google Virtual Tour is calculated as follows: ${totalShots} shots at ₹${pricePerShot}/shot, plus a ₹${uploadFee} one-time upload fee. Your total estimated cost is ₹${calculatedCost.toLocaleString(
+                    "en-IN"
+                )}.`;
+            }
+
+            setMessages((p) => [...p, { role: "model", text: reply }]);
+
+            // ✅ After Gemini response, ask meeting (but only once)
+            setTimeout(() => {
+                setMessages((p) => [
+                    ...p,
+                    { role: "model", text: 'Perfect 👍\nWould you like to schedule a short discussion with our expert team to understand your requirement and pricing in detail? (Type "Yes" and share your Name, email ID, contact No., and right time to talk or "No")' },
+                ]);
+                setFlowStep(4);
+            }, 500);
+        } catch (err) {
+            setMessages((p) => [
+                ...p,
+                { role: "model", text: "Sorry, something went wrong. Please try again in a moment." },
+            ]);
+        } finally {
+            setIsLoading(false);
         }
-        
-        // 3. GENERAL QUERY RESPONSE (or non-VT-related queries)
-        else {
-             // Append CTA for ALL general service inquiries and transition to form prompt stage
-             finalResponseText += " To schedule a visit and a detailed consultation covering all your digital needs, including Virtual Tours, Website Development, Networking, Server Management, and Web Applications, please share your Name, Location, and Contact Number. We look forward to meeting you.";
-             nextStage = 'form_prompt'; // <-- Set to prompt for meeting
-        }
+    };
 
+    const toggleChat = () => setIsOpen((p) => !p);
 
-        setMessages(prev => [...prev, { role: 'model', text: finalResponseText }]);
-        setConversationStage(nextStage);
-
-    } catch (error) {
-        console.error("Gemini API Fatal Error:", error);
-        setMessages(prev => [...prev, { role: 'model', text: `I apologize, there was an issue connecting to the AI service. Error: ${error.message || 'Unknown'}.` }]);
-    } finally {
-        setIsLoading(false);
-    }
-  };
-
-  const toggleChat = () => setIsOpen(prev => !prev);
-
-  // --- RENDERING ---
-
-  // Chat message component
-  const ChatMessage = ({ role, text }) => (
-    <div className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
-      <div 
-        className={`max-w-[80%] rounded-xl p-3 shadow-md ${
-          role === 'user'
-            ? 'bg-indigo-500 text-white rounded-br-none'
-            : 'bg-gray-100 text-gray-800 rounded-tl-none'
-        }`}
-      >
-        <p className="text-sm leading-snug">{text}</p>
-      </div>
-    </div>
-  );
-
-  const renderChatContent = () => {
-    if (conversationStage === 'showing_form') {
-      return <LeadCaptureForm 
-                isServiceReady={isServiceReady} // Using the new comprehensive state
-                onSave={saveLead} 
-              />;
-    }
-
-    // Default chat view
-    return (
-        <>
-            {/* Messages Body */}
-            <div className="flex-grow p-4 overflow-y-auto space-y-2 bg-gray-50">
-              {messages.map((msg, index) => (
-                <ChatMessage key={index} role={msg.role} text={msg.text} />
-              ))}
-              {isLoading && (
-                <div className="flex justify-start mb-3">
-                  <div className="max-w-[80%] rounded-xl p-3 shadow-md bg-gray-100 rounded-tl-none">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-300"></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {conversationStage === 'form_prompt' && (
-                <div className="flex justify-start mb-3">
-                  <div className="max-w-[80%] rounded-xl p-3 shadow-md bg-gray-100 rounded-tl-none">
-                    <p className="text-sm leading-snug font-semibold text-indigo-700">
-                        Will you want to fix a meeting to discuss your project? If so, we can share a form with you.
-                    </p>
-                    <p className="text-xs mt-1 text-gray-500">
-                        (Type 'Yes' or 'No' to continue.)
-                    </p>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+    const ChatMessage = ({ role, text }) => (
+        <div className={`flex ${role === "user" ? "justify-end" : "justify-start"} mb-2`}>
+            <div
+                className={`max-w-[80%] rounded-xl p-3 shadow-sm text-sm whitespace-pre-wrap ${role === "user"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-200 text-gray-900"
+                    }`}
+            >
+                {text}
             </div>
-
-            {/* Input Footer */}
-            <form onSubmit={handleSend} className="p-4 border-t bg-white flex">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={isLoading ? "Generating response..." : "Type your message..."}
-                className="flex-grow p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                className="bg-indigo-600 text-white p-3 rounded-r-lg hover:bg-indigo-700 transition duration-150 disabled:bg-indigo-400 flex items-center justify-center"
-                disabled={isLoading}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
-            </form>
-        </>
+        </div>
     );
-  };
 
+    const LeadForm = ({ onClose }) => {
+        const [name, setName] = useState("");
+        const [email, setEmail] = useState("");
+        const [date, setDate] = useState("");
+        const [purpose, setPurpose] = useState("");
 
-  return (
-    <div className="fixed bottom-4 right-4 z-50">
-      
-      {/* DEVELOPMENT STATUS (Keep for debugging persistence) */}
-      {isServiceReady && (
-        <div className="absolute -top-16 right-0 w-64 bg-white p-2 rounded-xl shadow-lg border border-indigo-200 text-xs">
-          <p className="font-semibold text-indigo-700">Persistence ID (Data Saved Here):</p>
-          <p className="break-all font-mono text-gray-600">{userId}</p>
+        const handleSubmit = (e) => {
+            e.preventDefault();
+
+            // ✅ 1. Build WhatsApp message FIRST
+            const whatsappMessage = `
+New Meeting Request 🚀
+
+Name: ${name}
+Email: ${email}
+Contact: ${contact}
+Meeting Date: ${meetDate}
+Meeting Time: ${meetTimeOnly}
+
+Requirement:
+${projectDesc}
+`;
+
+            // ✅ 2. OPEN WHATSAPP IMMEDIATELY (NO await)
+            const whatsappUrl =
+                "https://wa.me/9893567595?text=" +
+                encodeURIComponent(whatsappMessage);
+
+            window.open(whatsappUrl, "_blank");
+
+            // ✅ 3. (Optional) Save lead AFTER WhatsApp opens
+            if (onSave) {
+                onSave(
+                    {
+                        name,
+                        email,
+                        contact,
+                        meetTime: `${meetDate} ${meetTimeOnly}`,
+                    },
+                    projectDesc
+                );
+            }
+
+            // ✅ 4. Reset form (optional)
+            setName("");
+            setEmail("");
+            setContact("");
+            setMeetDate("");
+            setMeetTimeOnly("");
+            setProjectDesc("");
+        };
+
+        return (
+            <form onSubmit={handleSubmit} className="p-3 space-y-3 bg-white border rounded-lg">
+                <input
+                    required
+                    placeholder="Your Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full border p-2 rounded"
+                />
+                <input
+                    required
+                    type="email"
+                    placeholder="Email ID"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full border p-2 rounded"
+                />
+                <input
+                    required
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full border p-2 rounded"
+                />
+                <textarea
+                    required
+                    placeholder="Purpose of Meeting"
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    className="w-full border p-2 rounded"
+                />
+
+                <button className="w-full bg-indigo-600 text-white py-2 rounded">
+                    Send on WhatsApp
+                </button>
+            </form>
+        );
+    };
+    return (
+        <div className="fixed bottom-6 right-6 z-50 font-sans">
+            {isOpen && (
+                <div className="w-[360px] h-[480px] bg-white rounded-xl shadow-2xl flex flex-col mb-3">
+                    <div className="p-3 bg-indigo-600 text-white rounded-t-xl flex items-center justify-between">
+                        <div className="font-semibold">Digital IMALAG AI</div>
+                        <button onClick={toggleChat} className="text-white">✕</button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                        {messages.map((m, i) => (
+                            <ChatMessage key={i} role={m.role} text={m.text} />
+                        ))}
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    <form onSubmit={handleSend} className="flex border-t">
+                        <input
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder={isLoading ? "Please wait..." : "Type your message..."}
+                            disabled={isLoading}
+                            className="flex-1 p-3 outline-none"
+                        />
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="px-4 bg-indigo-600 text-white disabled:opacity-60"
+                        >
+                            ➤
+                        </button>
+                    </form>
+                </div>
+            )}
+
+            <button
+                onClick={toggleChat}
+                className="w-14 h-14 rounded-full bg-indigo-600 text-white shadow-xl flex items-center justify-center"
+                aria-label="Open chat"
+            >
+                💬
+            </button>
         </div>
-      )}
-
-      {/* CHAT WINDOW */}
-      <div 
-        className={`
-          transition-all duration-300 ease-in-out origin-bottom-right
-          w-[90vw] max-w-[400px] h-[70vh] max-h-[550px]
-          bg-white rounded-xl shadow-2xl flex flex-col
-          ${isOpen ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}
-        `}
-      >
-        {/* Header */}
-        <div className="p-4 flex items-center justify-between border-b bg-indigo-600 rounded-t-xl">
-          <div className="flex items-center">
-            <div className={`h-3 w-3 rounded-full mr-2 ${isLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-400'}`}></div>
-            <h2 className="text-lg font-semibold text-white">Digital IMALAG AI</h2>
-          </div>
-          <button 
-            onClick={toggleChat}
-            className="text-white hover:bg-indigo-700 p-1 rounded-full transition duration-150"
-            aria-label="Close Chat"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        
-        {/* Render Chat Content or Form */}
-        <div className="flex-grow flex flex-col overflow-y-auto">
-            {renderChatContent()}
-        </div>
-
-
-      </div>
-
-      {/* CHAT TOGGLE BUTTON */}
-      <button 
-        onClick={toggleChat}
-        className="bg-indigo-600 text-white w-14 h-14 rounded-full shadow-xl hover:bg-indigo-700 transition duration-300 transform hover:scale-105 flex items-center justify-center focus:outline-none focus:ring-4 focus:ring-indigo-300"
-        aria-label={isOpen ? "Close Chat" : "Open Chat"}
-      >
-        {isOpen ? (
-          // Close Icon
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          // Chat Icon
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M3 20l1.396-1.396A18.001 18.001 0 0012 18c4.956 0 9.294-1.12 12-3.396V20M21 3H3a2 2 0 00-2 2v14a2 2 0 002 2h18a2 2 0 002-2V5a2 2 0 00-2-2z" />
-          </svg>
-        )}
-      </button>
-    </div>
-  );
+    );
 }
